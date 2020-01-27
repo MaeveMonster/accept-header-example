@@ -5,11 +5,22 @@ const responseHandler = require('./responses.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const urlStruct = {
-
+    '/': responseHandler.getIndex,
+    '/cats': responseHandler.getCats,
+    index: responseHandler.getIndex,
 };
 
 const onRequest = (request, response) => {
-
+    const parsedUrl = url.parse(request.url);
+    //console.dir(request.url);
+    //console.dir(parsedUrl);
+    const acceptedTypes = request.headers.accept.split(',');
+    
+    if(urlStruct[parsedUrl.pathname]){
+        urlStruct[parsedUrl.pathname](request, response, acceptedTypes);
+    } else {
+        urlStruct.index(request, response, acceptedTypes);
+    }
 };
 
 http.createServer(onRequest).listen(port);
